@@ -7,8 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.io.Serializable;
 import java.util.Date;
 @Entity
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "product")

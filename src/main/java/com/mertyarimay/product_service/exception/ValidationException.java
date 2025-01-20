@@ -6,8 +6,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class ValidationException extends ProblemDetails {
     private Map<String,String>validationErrors;
 }
