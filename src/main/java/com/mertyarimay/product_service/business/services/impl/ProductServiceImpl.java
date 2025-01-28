@@ -1,96 +1,115 @@
 package com.mertyarimay.product_service.business.services.impl;
 
-import com.mertyarimay.product_service.bean.ModelMapperConfig;
-import com.mertyarimay.product_service.business.dto.ProductDto;
-import com.mertyarimay.product_service.business.services.ProductService;
+
+import com.mertyarimay.product_service.business.dto.productDto.CreateProductDto;
+import com.mertyarimay.product_service.business.dto.productDto.GetAllProductDto;
+import com.mertyarimay.product_service.business.dto.productDto.GetByIdProductDto;
+import com.mertyarimay.product_service.business.dto.productDto.UpdateProductDto;
+import com.mertyarimay.product_service.business.services.service.ProductService;
+import com.mertyarimay.product_service.business.services.servicesRules.ProductServiceRules;
+import com.mertyarimay.product_service.data.entity.ProductBrandEntity;
 import com.mertyarimay.product_service.data.entity.ProductEntity;
+import com.mertyarimay.product_service.data.repository.IProductBrandRepository;
 import com.mertyarimay.product_service.data.repository.IProductRepository;
 import com.mertyarimay.product_service.exception.BusinessException;
+import com.mertyarimay.product_service.mappers.ModelMapperService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Service
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final IProductRepository productRepository;
-    private final ModelMapperConfig modelMapper;
-
-
-
-    @Override
-    public ProductEntity dtoToEntity(ProductDto productDto) {
-        return modelMapper.modelMapper().map(productDto,ProductEntity.class);
-    }
-
-    @Override
-    public ProductDto entityToDto(ProductEntity productEntity) {
-        return modelMapper.modelMapper().map(productEntity,ProductDto.class);
-    }
-
+    private final ModelMapperService modelMapperService;
+    private final IProductBrandRepository productBrandRepository;
+    private final ProductServiceRules productServiceRules;
     @Override
     @Transactional  //bir database işlemi yapılıyorsa kullanılması gerekiyor
-    public ProductDto create(ProductDto productDto) {
-        if(productDto!=null){
-            ProductEntity productEntity=dtoToEntity(productDto);
-            productRepository.save(productEntity);
-            productDto.setId(productEntity.getId());
-            productDto.setCreatedDate(productEntity.getCreatedDate());
+    public CreateProductDto create(CreateProductDto createProductDto) {
+        if(createProductDto !=null){
+            ProductBrandEntity productBrandEntity=productBrandRepository.findById(createProductDto.getProductBrandId()).orElse(null);
+            if(productBrandEntity!=null){
+                ProductEntity productEntity=modelMapperService.forRequest().map(createProductDto,ProductEntity.class);
+                productEntity.setProductBrandEntity(productBrandEntity);
+                productRepository.save(productEntity);
+                CreateProductDto createProduct=modelMapperService.forRequest().map(productEntity,CreateProductDto.class);
+                return createProduct;
+            }
+            else {
+                throw new BusinessException("Girdiğiniz productBrandId Mevcut değil");
+            }
 
+        }
+        return null;
+
+
+
+    }
+
+    @Override
+    public List<GetAllProductDto >getAll() {
+        List<ProductEntity>productEntities=productRepository.findAll();
+        List<GetAllProductDto>getAllProductDtos=productEntities.stream().map(productEntity -> modelMapperService.forResponse()
+                .map(productEntity, GetAllProductDto.class))
+                .collect(Collectors.toList());
+        return getAllProductDtos;
+
+    }
+
+    @Override
+    public List<GetAllProductDto> getAllBrandId(Optional<Integer>productBrandId) {
+        if(productBrandId.isPresent()){
+            ProductBrandEntity productBrandEntity=productBrandRepository.findById(productBrandId.get()).orElse(null);
+            if(productBrandEntity==null){
+                throw new BusinessException("Giridiğiniz BrandId Mevcut değildir");
+            }else{
+                List<ProductEntity>productEntities=productRepository.findByProductBrandEntity_Id(productBrandId.get());
+                List<GetAllProductDto>getAllProductDtos=productEntities.stream()
+                        .map(productEntity -> modelMapperService.forResponse()
+                                .map(productEntity, GetAllProductDto.class)).collect(Collectors.toList());
+                return getAllProductDtos;
+
+            }
+        }
+        return null;
+
+    }
+
+    @Override
+    public GetByIdProductDto getById(int id) {
+        ProductEntity productEntity=productRepository.findById(id).orElse(null);
+        if(productEntity!=null){
+            GetByIdProductDto getByIdProductDto=modelMapperService.forResponse().map(productEntity, GetByIdProductDto.class);
+            return getByIdProductDto;
         }
         else {
-            throw new BusinessException("Product dto NULL");
+            return null;
         }
-        return productDto;
     }
 
     @Override
-    public List<ProductDto> getAllProducts() {
-        List<ProductEntity>productEntities=productRepository.findAll();
-        List<ProductDto>productDtos=new ArrayList<>();
-        for(ProductEntity temp:productEntities){
-            ProductDto productDto=entityToDto(temp);
-            productDtos.add(productDto);
-
-        }
-        return productDtos;
-
+    public UpdateProductDto update(UpdateProductDto updateProductDto, int id) {
+       ProductEntity productEntity=productRepository.findById(id).orElse(null);
+       if(productEntity!=null){
+           productServiceRules.checkPrice(id,updateProductDto.getProductPrice());
+           productEntity.setProductPrice(updateProductDto.getProductPrice());
+           productRepository.save(productEntity);
+           UpdateProductDto updateProduct=modelMapperService.forRequest().map(productEntity,UpdateProductDto.class);
+           return updateProduct;
+       }
+       return null;
     }
 
     @Override
-    public ProductDto getById(int id) {
+    public boolean delete(int id) {
         ProductEntity productEntity=productRepository.findById(id).orElse(null);
         if(productEntity!=null){
-            ProductDto productDto=entityToDto(productEntity);
-            return productDto;
-        }
-        return null;
-    }
-
-    @Override
-    @Transactional
-    public ProductDto update(ProductDto productDto, int id) {
-        ProductEntity productEntity=productRepository.findById(id).orElse(null);
-        if(productEntity!=null){
-            productEntity.setProductName(productDto.getProductName());
-            productEntity.setProductPrice(productDto.getProductPrice());
-            productRepository.save(productEntity);
-            ProductDto productModel=entityToDto(productEntity);
-            return productModel;
-        }
-        return null;
-
-    }
-
-    @Override
-    @Transactional
-    public Boolean delete(int id) {
-        Optional<ProductEntity> productEntity=productRepository.findById(id);
-        if(productEntity.isPresent()){
             productRepository.deleteById(id);
             return true;
         }

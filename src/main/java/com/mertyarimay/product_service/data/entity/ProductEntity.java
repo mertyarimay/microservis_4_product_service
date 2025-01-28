@@ -2,10 +2,11 @@ package com.mertyarimay.product_service.data.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -24,7 +25,26 @@ public class ProductEntity implements Serializable {
     @Column(name ="product_price")
     private double productPrice;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)  //Otomatik olarak eklensin diye  TIMESTAMP bu hem zaman hem tarih olarak ekler
-    private Date createdDate;
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "colour")
+    private String colour ;
+
+    private LocalDateTime publishedAt;
+    private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "product_brand_id")
+    private ProductBrandEntity productBrandEntity;
+
+
+    @PrePersist
+    public void prePersist(){
+        this.publishedAt=LocalDateTime.now();
+    }
+    @PreUpdate
+    public void preUpdate(){
+        this.updatedAt=LocalDateTime.now();
+    }
 }
