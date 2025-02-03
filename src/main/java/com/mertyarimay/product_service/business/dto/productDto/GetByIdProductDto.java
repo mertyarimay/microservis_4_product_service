@@ -13,4 +13,5 @@ public class GetByIdProductDto {
     private String description;
     private String colour;
     private String brandName;
+    private int stockQuantity;
 }

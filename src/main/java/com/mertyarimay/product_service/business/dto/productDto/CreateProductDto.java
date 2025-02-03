@@ -27,4 +27,6 @@ public class CreateProductDto implements Serializable {
     private String colour;
     @NotNull
     private int productBrandId;
+    @NotNull
+    private int stockQuantity;
 }

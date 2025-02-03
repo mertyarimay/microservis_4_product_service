@@ -30,6 +30,8 @@ public class ProductEntity implements Serializable {
 
     @Column(name = "colour")
     private String colour ;
+    @Column(name = "stock_quantity")
+    private int stockQuantity;
 
     private LocalDateTime publishedAt;
     private LocalDateTime updatedAt;
