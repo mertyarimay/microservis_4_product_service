@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class GetByIdProductDto {
+    private int id;
     private String productName;
     private double productPrice;
     private String description;
