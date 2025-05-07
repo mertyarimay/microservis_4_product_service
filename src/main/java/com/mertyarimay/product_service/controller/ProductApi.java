@@ -55,7 +55,7 @@ public class ProductApi {
         if(getByIdProductDto!=null){
             return ResponseEntity.ok(getByIdProductDto);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Girdiğiniz Id BULUNAMADI");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("İstediğiniz Ürün Bulunamadı");
     }
 
     @PutMapping("/update/{id}")

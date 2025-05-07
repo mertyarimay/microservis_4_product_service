@@ -84,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public GetByIdProductDto getById(int id) {
         ProductEntity productEntity=productRepository.findById(id).orElse(null);
-        if(productEntity!=null){
+        if(productEntity!=null&&productEntity.getStockQuantity()>=1){
             GetByIdProductDto getByIdProductDto=modelMapperService.forResponse().map(productEntity, GetByIdProductDto.class);
             return getByIdProductDto;
         }
