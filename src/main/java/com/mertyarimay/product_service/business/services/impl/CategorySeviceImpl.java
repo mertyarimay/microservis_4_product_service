@@ -41,23 +41,22 @@ public class CategorySeviceImpl implements CategoryService {
                CreateCategoryDto createCategory=modelMapperService.forRequest().map(categoryEntity,CreateCategoryDto.class);
                return createCategory;
            }else {
-               throw new BusinessException("Bu İd ye Ait Course Title Mevcut Değil");
+               throw new BusinessException("Bu İd ye Ait category Title Mevcut Değil");
 
            }
         }
         return null;
     }
-
     @Override
     public List<GetAllCategoryTitleIdDto> getAll(Optional<Integer> categoryTitleId) {
-        if(categoryTitleId.isPresent()){
+        if (categoryTitleId.isPresent()) {
             categoryServiceRules.checkCategoryTitleId(categoryTitleId.get());
-            List<CategoryEntity>categoryEntities=categoryRepository.findByCategoryTitleEntity_Id(categoryTitleId.get());
-            List<GetAllCategoryTitleIdDto> getAllCategoryTitleIdDtos =categoryEntities.stream().map(categoryEntity -> {
-                GetAllCategoryTitleIdDto getAllCategoryTitleIdDto =new GetAllCategoryTitleIdDto();
+            List<CategoryEntity> categoryEntities = categoryRepository.findByCategoryTitleEntity_Id(categoryTitleId.get());
+            List<GetAllCategoryTitleIdDto> getAllCategoryTitleIdDtos = categoryEntities.stream().map(categoryEntity -> {
+                GetAllCategoryTitleIdDto getAllCategoryTitleIdDto = new GetAllCategoryTitleIdDto();
                 getAllCategoryTitleIdDto.setCategoryTitleName(categoryEntity.getCategoryTitleEntity().getCategoryTitleName());
                 getAllCategoryTitleIdDto.setCategoryName(categoryEntity.getCategoryName());
-                List<String>productBrandList=categoryEntity.getProductBrandEntities().stream()
+                List<String> productBrandList = categoryEntity.getProductBrandEntities().stream()
                         .map(productBrandEntity -> productBrandEntity.getBrandName())
                         .collect(Collectors.toList());
                 getAllCategoryTitleIdDto.setProductBrandList(productBrandList);
@@ -65,9 +64,8 @@ public class CategorySeviceImpl implements CategoryService {
 
                 List<String> productList = categoryEntity.getProductBrandEntities().stream()
                         .flatMap(productBrandEntity -> productBrandEntity.getProductEntities().stream())
-                                .map(productEntity -> productEntity.getProductName())
-                                .collect(Collectors.toList());
-
+                        .map(productEntity -> productEntity.getProductName())
+                        .collect(Collectors.toList());
 
 
                 getAllCategoryTitleIdDto.setProductList(productList);
@@ -78,9 +76,7 @@ public class CategorySeviceImpl implements CategoryService {
 
         }
         return null;
-
     }
-
     @Override
     public GetByIdCategoryDto getById(int id) {
         CategoryEntity categoryEntity=categoryRepository.findById(id).orElse(null);
@@ -116,11 +112,10 @@ public class CategorySeviceImpl implements CategoryService {
         CategoryEntity categoryEntity=categoryRepository.findById(id).orElse(null);
         if(categoryEntity!=null){
             categoryRepository.deleteById(id);
-            return true;
-        }else {
-            return false;
+            if(!categoryRepository.existsById(id)){
+                return true;
+            }
+
         }
-    }
-
-
-}
+        return false;
+    }}

@@ -4,22 +4,19 @@ package com.mertyarimay.product_service.business.services.impl;
 import com.mertyarimay.product_service.business.dto.productBrandDto.CreateProductBrandDto;
 import com.mertyarimay.product_service.business.dto.productBrandDto.GetAllProductBrandDto;
 import com.mertyarimay.product_service.business.dto.productBrandDto.GetByIdProductBrandDto;
-import com.mertyarimay.product_service.business.dto.productDto.GetAllProductDto;
 import com.mertyarimay.product_service.business.services.service.ProductBrandService;
 import com.mertyarimay.product_service.business.services.servicesRules.ProductBrandServicesRules;
 import com.mertyarimay.product_service.data.entity.CategoryEntity;
 import com.mertyarimay.product_service.data.entity.ProductBrandEntity;
-import com.mertyarimay.product_service.data.entity.ProductEntity;
 import com.mertyarimay.product_service.data.repository.ICategoryRepository;
 import com.mertyarimay.product_service.data.repository.IProductBrandRepository;
-import com.mertyarimay.product_service.data.repository.IProductRepository;
 import com.mertyarimay.product_service.exception.BusinessException;
 import com.mertyarimay.product_service.mappers.ModelMapperService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -95,6 +92,7 @@ public class ProductBrandServiceImpl implements ProductBrandService {
         ProductBrandEntity productBrandEntity=productBrandRepository.findById(id).orElse(null);
         if(productBrandEntity!=null){
             productBrandRepository.deleteById(id);
+            if (!productBrandRepository.existsById(id))
             return true;
         }
         return false;

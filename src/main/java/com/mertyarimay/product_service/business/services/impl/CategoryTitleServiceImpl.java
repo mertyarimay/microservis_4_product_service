@@ -78,11 +78,10 @@ public class CategoryTitleServiceImpl implements CategoryTitleService {
         CategoryTitleEntity categoryTitleEntity=categoryTitleRepository.findById(id).orElse(null);
         if(categoryTitleEntity!=null){
             categoryTitleRepository.deleteById(id);
-            return true;
-
-        }else {
-            return false;
-        }
+            if(!categoryTitleRepository.existsById(id)){
+                return true;
+            }}
+        return false;
     }
 
 }

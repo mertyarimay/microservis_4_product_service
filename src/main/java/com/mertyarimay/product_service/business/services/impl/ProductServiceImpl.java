@@ -111,9 +111,12 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity productEntity=productRepository.findById(id).orElse(null);
         if(productEntity!=null){
             productRepository.deleteById(id);
-            return true;
+            if(!productRepository.existsById(id)){
+                return true;
+            }
         }
         return false;
+
     }
 
 

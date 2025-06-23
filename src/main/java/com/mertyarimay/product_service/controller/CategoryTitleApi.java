@@ -47,7 +47,7 @@ public class CategoryTitleApi {
         if(delete==true){
             return ResponseEntity.ok("Silme İşlemi Başarılı Bir şekilde gerçekleşti");
         }else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Silmek İstediğiniz Id Bulunamadı");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Silme İşlemi Başarısız");
         }
     }
 }
